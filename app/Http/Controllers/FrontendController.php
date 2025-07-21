@@ -18,7 +18,7 @@ class FrontendController extends Controller
         $plans = Plan::whereIn('validity_days', [30, 90, 180, 365])
             ->orderBy('created_at', 'asc')
             ->withAvg('reviews', 'rating')
-            ->get(3);
+            ->get();
 
         // Offer plan jisme discount hai aur expiry date valid hai
         $offerPlan = Plan::whereNotNull('expiry_date')
