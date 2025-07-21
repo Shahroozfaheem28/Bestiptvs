@@ -62,6 +62,7 @@
             transform: scale(1.1);
             z-index: 1;
         }
+
         .btn-light:hover {
             background-color: #c800ff !important;
             /* Purple glow */
@@ -193,7 +194,22 @@
             height: 200px;
         }
     </style>
+@php
+    use Carbon\Carbon;
 
+    // Default values taake undefined error na aaye
+    $discount = 0;
+    $percent = 0;
+    $expiryJsDate = null;
+    $isExpired = true;
+
+    if (isset($offerPlan) && $offerPlan->price > $offerPlan->sale_price && $offerPlan->expiry_date) {
+        $discount = $offerPlan->price - $offerPlan->sale_price;
+        $percent = ($discount / $offerPlan->price) * 100;
+        $expiryJsDate = Carbon::parse($offerPlan->expiry_date)->format('M d, Y H:i:s');
+        $isExpired = Carbon::parse($offerPlan->expiry_date)->isPast();
+    }
+@endphp
     {{-- HERO / PROMO --}}
     <section class="py-5 bg-white position-relative overflow-hidden">
         <div class="container">
@@ -229,7 +245,7 @@
 
                     <p class="text-success mt-3 fw-semibold">
                         @foreach ($plans as $plan)
-                            @php    
+                            @php
                                 $isOneMonth = $plan->validity_days == 30;
                                 $discountAmount = $plan->price - $plan->sale_price;
                                 $discountPercent = $plan->price > 0 ? round(($discountAmount / $plan->price) * 100) : 0;
@@ -295,7 +311,10 @@
                 @php
                     $discount = $offerPlan->price - $offerPlan->sale_price;
                     $percent = ($discount / $offerPlan->price) * 100;
-                    $expiryJsDate = \Carbon\Carbon::parse($offerPlan->expiry_date)->format('M d, Y H:i:s');
+                    $expiryJsDate =
+                        $offerPlan && $offerPlan->expiry_date
+                            ? \Carbon\Carbon::parse($offerPlan->expiry_date)->format('M d, Y H:i:s')
+                            : null;
                 @endphp
                 <p class="text-dark fw-bold">
                     {{ $offerPlan->title }}
@@ -442,7 +461,7 @@
                     </ul>
 
                     <!-- Countdown Timer -->
-                    <h5 class="text-danger fw-bold countdown-timer">Offer Expired Now</h5>
+                      <h5 class="text-danger mb-4 countdown-timer" id="countdown-timer">Loading...</h5>
                 </div>
 
                 <!-- Right Video/Image Section -->
@@ -557,7 +576,8 @@
                                 <p class="card-text text-muted small">
                                     {{ Str::limit(strip_tags($blog->content), 100) }}
                                 </p>
-                                <a href="{{ route('blog.show', $blog->slug) }}" class="mt-auto btn btn-primary rounded-pill  btn-sm">
+                                <a href="{{ route('blog.show', $blog->slug) }}"
+                                    class="mt-auto btn btn-primary rounded-pill  btn-sm">
                                     Read More →
                                 </a>
                             </div>
