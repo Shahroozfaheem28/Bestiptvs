@@ -27,7 +27,7 @@ Route::get('/plans', [FrontendController::class, 'plans']);
 Route::get('/contact', [FrontendController::class, 'contact'])->name('contact');
 Route::post('/contact', [FrontendController::class, 'submitContact'])->name('contact.submit');
 Route::get('/faq', [FrontendController::class, 'faq'])->name('faq.page');
-Route::get('/plan', [FrontendController::class, 'plan'])->name('plan.show');
+Route::get('/plan', [FrontendController::class, 'plan'])->name('plans.index');
 Route::get('/about', [FrontendController::class, 'about'])->name('plans.about');
 
 // Static Pages
